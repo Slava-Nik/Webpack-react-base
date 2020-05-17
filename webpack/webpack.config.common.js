@@ -41,7 +41,7 @@ module.exports = {
 			},
 			{
 				test: /\.(png|jpe?g|gif|svg)$/i,
-				use: helpers.getImageLoaders({compress: false}),
+				use: helpers.getImageLoaders({compress: true}),
 			},
 			{
 				test: /\.(ttf|woff|woff2|eot)$/i,

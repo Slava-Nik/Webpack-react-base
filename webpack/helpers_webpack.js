@@ -95,11 +95,12 @@ const getImageLoaders = (params) => {
 						}),
 						imageminMozjpeg({
 							progressive: true,
-							arithmetic: false
+							arithmetic: false,
+							quality: 90
 						}),
 						imageminPngquant({
-							floyd: 0.5,
-							speed: 2
+							speed: 1,
+							quality: [0.95, 1]
 						}),
 						imageminSvgo({
 							plugins: [
