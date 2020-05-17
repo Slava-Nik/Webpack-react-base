@@ -8,7 +8,11 @@ module.exports = merge(commonConfig, {
 	devtool: "source-map",
 	devServer: {
 		contentBase: PATHS.dist,
-		port: 5000,
+		port: 8081,
 		hot: true,
+		overlay: {
+			warnings: true,
+			errors: true
+		}
 	}
 });
