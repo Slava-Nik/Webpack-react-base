@@ -1,21 +1,23 @@
-const path = require("path");
+const {PATHS} = require("./constants_webpack");
 const helpers = require("./helpers_webpack.js");
 
+
+
 module.exports = {
-	context: path.resolve(__dirname, "../src"),
+	context: PATHS.src,
 	entry: {
 		main: ["@babel/polyfill", "./index.js"],
 	},
 	output: {
 		filename: helpers.getFilename("js"),
-		path: path.resolve(__dirname, "../dist")
+		path: PATHS.dist
 	},
 	resolve: {
 		extensions: [".js", ".ts", ".json", ".jsx",".scss"],
 		alias: {
-			"@components": path.resolve(__dirname, "../src/components"),
-			"@assets": path.resolve(__dirname, "../src/assets"),
-			"@": path.resolve(__dirname, "../src"),
+			"@": PATHS.src,
+			"@components": PATHS.components,
+			"@assets": PATHS.assets,
 		},
 	},
 	optimization: {
