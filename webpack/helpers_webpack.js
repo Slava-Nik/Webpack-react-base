@@ -1,5 +1,6 @@
+const webpack = require("webpack");
 const path = require("path");
-const {PATHS, isDev, isProd} = require("./constants_webpack");
+const { PATHS, isDev, isProd } = require("./constants_webpack");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -10,117 +11,122 @@ const imageminMozjpeg = require("imagemin-mozjpeg");
 const imageminGifsicle = require("imagemin-gifsicle");
 const imageminSvgo = require("imagemin-svgo");
 
-
-const getFilename = (ext) => (isDev ? `[name].${ext}` : `[name].[hash].${ext}`);
+const getFilename = (ext) =>
+  isDev ? `[name].${ext}` : `[name].[contenthash].${ext}`;
 
 const getPlugins = () => {
-	return [
-		new CleanWebpackPlugin(),
-		new CopyWebpackPlugin({
-			patterns: [
-				{
-					from: path.join(PATHS.static, 'favicon.ico'),
-					to: PATHS.dist,
-				},
-			],
-		}),
-		new HtmlWebpackPlugin({
-			filename: "index.html",
-			template: "./index.html"
-		}),
-		new MiniCssExtractPlugin({
-			filename: getFilename("css"),
-		})
-	];
+  const plugins = [
+    new CleanWebpackPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(PATHS.static, "favicon.ico"),
+          to: PATHS.dist,
+        },
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      filename: "index.html",
+      template: "./index.html",
+    }),
+    new MiniCssExtractPlugin({
+      filename: getFilename("css"),
+    }),
+  ];
+  if (isDev) {
+    plugins.push(
+      new webpack.SourceMapDevToolPlugin({
+        filename: "sourcemaps/[file].map",
+        test: /\.(js|jsx|css)(\?|$)/i,
+        exclude: /chunk-vendors\..+?\.js/i,
+      })
+    );
+  }
+  return plugins;
 };
 
 const getJSLoaders = () => {
-	const loaders = ["babel-loader"];
-	if(isDev){
-		loaders.push({
-			loader: "eslint-loader",
-		});
-	}
-	return loaders;
+  const loaders = ["babel-loader"];
+  if (isDev) {
+    loaders.push({
+      loader: "eslint-loader",
+    });
+  }
+  return loaders;
 };
 
-
 const getCSSLoaders = (extraLoader) => {
-	const loaders = [
-		{
-			loader: MiniCssExtractPlugin.loader,
-			options: { hmr: isDev, reloadAll: isDev },
-		},
-		"css-loader",
-	];
-	if(isProd){
-		loaders.push({
-			loader: "postcss-loader",
-			options: {
-				plugins: [
-					autoprefixer()
-				],
-				sourceMap: true
-			}
-		});
-	}
-	if (extraLoader) loaders.push(extraLoader);
-	return loaders;
+  const loaders = [
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: { hmr: isDev, reloadAll: isDev },
+    },
+    "css-loader",
+  ];
+  if (isProd) {
+    loaders.push({
+      loader: "postcss-loader",
+      options: {
+        plugins: [autoprefixer()],
+      },
+    });
+  }
+  if (extraLoader) loaders.push(extraLoader);
+  return loaders;
 };
 
 const getFontLoaders = () => {
-	return [{
-		loader: "file-loader",
-		options: {
-			name:  isDev ? "[path][name].[ext]" : "[contenthash].[ext]",
-		},
-	}];
+  return [
+    {
+      loader: "file-loader",
+      options: {
+        name: "[path][name].[ext]",
+      },
+    },
+  ];
 };
 
 const getImageLoaders = (params) => {
-	const loaders =  [{
-		loader: "file-loader",
-		options: {
-			name:  isDev ? "[path][name].[ext]" : "[contenthash].[ext]",
-		},
-	}];
-	if(params.compress){
-		loaders.push(
-			{
-				loader: "img-loader",
-				options: {
-					plugins: [
-						imageminGifsicle({
-							interlaced: false
-						}),
-						imageminMozjpeg({
-							progressive: true,
-							arithmetic: false,
-							quality: 90
-						}),
-						imageminPngquant({
-							speed: 1,
-							quality: [0.95, 1]
-						}),
-						imageminSvgo({
-							plugins: [
-								{ removeTitle: true },
-								{ convertPathData: false }
-							]
-						})
-					]
-				}
-			}
-		);
-	}
-	return loaders;
+  const loaders = [
+    {
+      loader: "file-loader",
+      options: {
+        name: isDev ? "[path][name].[ext]" : "[path][name].[contenthash].[ext]",
+      },
+    },
+  ];
+  if (params.compress) {
+    loaders.push({
+      loader: "img-loader",
+      options: {
+        plugins: [
+          imageminGifsicle({
+            interlaced: false,
+          }),
+          imageminMozjpeg({
+            progressive: true,
+            arithmetic: false,
+            quality: 90,
+          }),
+          imageminPngquant({
+            speed: 1,
+            quality: [0.95, 1],
+          }),
+          imageminSvgo({
+            plugins: [{ removeTitle: true }, { convertPathData: false }],
+          }),
+        ],
+      },
+    });
+  }
+  return loaders;
 };
 
-module.exports =  {
-	getPlugins,
-	getJSLoaders,
-	getCSSLoaders,
-	getFontLoaders,
-	getImageLoaders,
-	getFilename
+module.exports = {
+  getPlugins,
+  getJSLoaders,
+  getCSSLoaders,
+  getFontLoaders,
+  getImageLoaders,
+  getFilename,
 };
