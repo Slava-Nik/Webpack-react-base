@@ -4,6 +4,7 @@ const { PATHS } = require("./constants_webpack");
 
 module.exports = merge(commonConfig, {
   mode: "development",
+  devtool: 'source-map',
   devServer: {
     contentBase: PATHS.dist,
     port: 8081,
